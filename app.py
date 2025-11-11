@@ -38,6 +38,12 @@ missing = sorted(df_names - gj_names)
 dfv["Country"] = dfv["Country"].replace({
     "United States" : "United States of America"
 })
+
+dfv["Elev_num"] = pd.to_numeric(dfv["Elev"], errors="coerce").fillna(0)
+dfv["Elev_size"] = dfv["Elev_num"].clip(lower=0)   
+# q95 = dfv["Elev_size"].quantile(0.95)
+# dfv["Elev_size"] = dfv["Elev_size"].clip(upper=q95)
+
 df_contries = dfv.groupby(by=["Country"])["Volcano Name"].count().reset_index(name="num_volcanes")
 
 # Show fig - Map
@@ -76,6 +82,8 @@ fig.add_annotation(
 fig_volcano = px.scatter_map(dfv, 
                              lat='Latitude', lon='Longitude', 
                              color='Type', 
+                             size='Elev_size',
+                             size_max=12, opacity=0.6,
                              hover_name='Volcano Name', 
                              hover_data=['Type','Country','Status','Region'], 
                              zoom=2 )
